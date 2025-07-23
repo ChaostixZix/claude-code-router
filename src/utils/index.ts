@@ -10,27 +10,19 @@ import {
 
 const DEBUG_LOG_FILE = `${HOME_DIR}/claude-router-debug.log`;
 
-const writeDebugLog = async (message: string) => {
-  try {
-    await appendFile(DEBUG_LOG_FILE, `${new Date().toISOString()} - ${message}\n`, 'utf8');
-  } catch (error) {
-    console.error(`Failed to write debug log: ${error.message}`);
-  }
-};
-
-const ensureDir = async (dir_path: string) => {
-  try {
-    await fs.access(dir_path);
-  } catch {
-    await fs.mkdir(dir_path, { recursive: true });
-  }
-};
-
 export const writeDebugLog = async (message: string) => {
   try {
     await appendFile(DEBUG_LOG_FILE, `${new Date().toISOString()} - ${message}\n`, 'utf8');
   } catch (error: any) {
     console.error(`Failed to write debug log: ${error.message}`);
+  }
+};
+
+export const ensureDir = async (dir_path: string) => {
+  try {
+    await fs.access(dir_path);
+  } catch {
+    await fs.mkdir(dir_path, { recursive: true });
   }
 };
 
