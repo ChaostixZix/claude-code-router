@@ -45,8 +45,12 @@ const confirm = async (query: string): Promise<boolean> => {
 export const readConfigFile = async () => {
   try {
     const config = await fs.readFile(CONFIG_FILE, "utf-8");
-    return JSON.parse(config);
-  } catch {
+    const parsedConfig = JSON.parse(config);
+    console.log(`[Kilo Code Debug] Successfully parsed config from ${CONFIG_FILE}`);
+    return parsedConfig;
+  } catch (error) {
+    console.error(`[Kilo Code Debug] Error reading or parsing config file at ${CONFIG_FILE}: ${error.message}`);
+    console.log("[Kilo Code Debug] Prompting for new config due to error or missing file.");
     const name = await question("Enter Provider Name: ");
     const APIKEY = await question("Enter Provider API KEY: ");
     const baseUrl = await question("Enter Provider URL: ");

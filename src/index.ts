@@ -47,6 +47,11 @@ async function run(options: RunOptions = {}) {
   await initializeClaudeConfig();
   await initDir();
   const config = await initConfig();
+  console.log(`[Kilo Code Debug] Initial config object after initConfig: ${JSON.stringify(config, null, 2)}`);
+  console.log(`[Kilo Code Debug] CONFIG_FILE path used: ${CONFIG_FILE}`);
+  console.log(`[Kilo Code Debug] Process env before config assign: ${JSON.stringify(process.env, null, 2)}`);
+  Object.assign(process.env, config);
+  console.log(`[Kilo Code Debug] Process env after config assign: ${JSON.stringify(process.env, null, 2)}`);
   let HOST = config.HOST;
 
   if (config.HOST && !config.APIKEY) {
