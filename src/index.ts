@@ -39,8 +39,11 @@ interface RunOptions {
 
 async function run(options: RunOptions = {}) {
   // Check if service is already running
-  if (isServiceRunning()) {
+  const serviceRunning = isServiceRunning();
+  await writeDebugLog(`isServiceRunning() returned: ${serviceRunning}`);
+  if (serviceRunning) {
     console.log("✅ Service is already running in the background.");
+    await writeDebugLog("Service already running, exiting new instance.");
     return;
   }
 

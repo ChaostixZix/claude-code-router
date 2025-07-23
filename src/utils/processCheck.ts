@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { PID_FILE, REFERENCE_COUNT_FILE } from '../constants';
-import { readConfigFile } from '.';
+import { readConfigFile, writeDebugLog } from '.';
 
 export function incrementReferenceCount() {
     let count = 0;
@@ -28,16 +28,20 @@ export function getReferenceCount(): number {
 }
 
 export function isServiceRunning(): boolean {
+    writeDebugLog(`Checking if service is running. PID_FILE: ${PID_FILE}`);
     if (!existsSync(PID_FILE)) {
+        writeDebugLog(`PID_FILE does not exist. Service is not running.`);
         return false;
     }
 
     try {
         const pid = parseInt(readFileSync(PID_FILE, 'utf-8'));
-        process.kill(pid, 0);
+        writeDebugLog(`Found PID ${pid} in PID_FILE. Attempting to signal process.`);
+        process.kill(pid, 0); // Signal 0 checks if process exists
+        writeDebugLog(`Process ${pid} is running.`);
         return true;
-    } catch (e) {
-        // Process not running, clean up pid file
+    } catch (e: any) {
+        writeDebugLog(`Process not running or signal failed for PID in PID_FILE. Error: ${e.message}. Cleaning up PID file.`);
         cleanupPidFile();
         return false;
     }
@@ -62,7 +66,7 @@ export function getServicePid(): number | null {
     if (!existsSync(PID_FILE)) {
         return null;
     }
-    
+
     try {
         const pid = parseInt(readFileSync(PID_FILE, 'utf-8'));
         return isNaN(pid) ? null : pid;
@@ -75,7 +79,7 @@ export async function getServiceInfo() {
     const pid = getServicePid();
     const running = isServiceRunning();
     const config = await readConfigFile();
-    
+
     return {
         running,
         pid,
