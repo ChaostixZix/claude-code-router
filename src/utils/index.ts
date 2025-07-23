@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import readline from "node:readline";
+import { appendFile } from "node:fs/promises";
 import {
   CONFIG_FILE,
   DEFAULT_CONFIG,
@@ -7,11 +8,29 @@ import {
   PLUGINS_DIR,
 } from "../constants";
 
+const DEBUG_LOG_FILE = `${HOME_DIR}/claude-router-debug.log`;
+
+const writeDebugLog = async (message: string) => {
+  try {
+    await appendFile(DEBUG_LOG_FILE, `${new Date().toISOString()} - ${message}\n`, 'utf8');
+  } catch (error) {
+    console.error(`Failed to write debug log: ${error.message}`);
+  }
+};
+
 const ensureDir = async (dir_path: string) => {
   try {
     await fs.access(dir_path);
   } catch {
     await fs.mkdir(dir_path, { recursive: true });
+  }
+};
+
+export const writeDebugLog = async (message: string) => {
+  try {
+    await appendFile(DEBUG_LOG_FILE, `${new Date().toISOString()} - ${message}\n`, 'utf8');
+  } catch (error: any) {
+    console.error(`Failed to write debug log: ${error.message}`);
   }
 };
 
@@ -46,11 +65,11 @@ export const readConfigFile = async () => {
   try {
     const config = await fs.readFile(CONFIG_FILE, "utf-8");
     const parsedConfig = JSON.parse(config);
-    console.log(`[Kilo Code Debug] Successfully parsed config from ${CONFIG_FILE}`);
+    await writeDebugLog(`Successfully parsed config from ${CONFIG_FILE}`);
     return parsedConfig;
-  } catch (error) {
-    console.error(`[Kilo Code Debug] Error reading or parsing config file at ${CONFIG_FILE}: ${error.message}`);
-    console.log("[Kilo Code Debug] Prompting for new config due to error or missing file.");
+  } catch (error: any) {
+    await writeDebugLog(`Error reading or parsing config file at ${CONFIG_FILE}: ${error.message}`);
+    await writeDebugLog("Prompting for new config due to error or missing file.");
     const name = await question("Enter Provider Name: ");
     const APIKEY = await question("Enter Provider API KEY: ");
     const baseUrl = await question("Enter Provider URL: ");
