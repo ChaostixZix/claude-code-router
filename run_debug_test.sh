@@ -3,8 +3,14 @@
 # Define the path to the debug log file
 DEBUG_LOG_FILE="$HOME/.claude-code-router/claude-router-debug.log"
 
-# Define the project directory
-PROJECT_DIR="/home/bintangputra/claude-code-router" # Adjust for macOS if needed
+# Define the project directory based on OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    PROJECT_DIR="$HOME/Desktop/claude-code-router"
+else
+    # Linux/Ubuntu
+    PROJECT_DIR="/home/bintangputra/claude-code-router"
+fi
 
 # Clear previous debug logs
 > "$DEBUG_LOG_FILE"
